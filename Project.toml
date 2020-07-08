@@ -1,0 +1,12 @@
+name = "CSAD"
+uuid = "375eccd0-8544-4396-a903-bde55260c147"
+authors = ["relmo <rachid.elmontassir@etu.enseeiht.fr>"]
+version = "0.1.0"
+
+[deps]
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
