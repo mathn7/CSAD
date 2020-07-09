@@ -1,0 +1,387 @@
+clear variables
+close all
+% Exemple de script pour trouver les classes d'individus dans dataset
+load('dataset.mat')
+% 1 -Faire l'ACP
+[nb_indiv,nb_param] = size(X);
+x_mean = mean(X,1);
+Xc = X-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+% Avec l'observation du pourcentage de trace fourni par les valeurs propres,
+% on voit qu'il faut 6 axes principaux pour avoir un bon niveau
+% d'info.
+figure(1),clf
+plot(1:nb_param,D/trace(S),'r-*','linewidth',2);
+xlabel('num de la composante');
+ylabel('pourcentage d info')
+title('Pourcentage d info apportee par les x premieres comp. ppales')
+
+ pause
+
+% 2 - On observe donc sur les 8 premiers axes principaux (les 2 derniers axes 
+% n'apportent aucune info. Je les affiche pour mettre en avant le phénomène)
+figure(2), clf
+ax = 1;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+ax = 2;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 2')
+ax = 3;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 3')
+ax = 4;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 4')
+ax = 5;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 5')
+ax = 6;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 6')
+ax = 7;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 7')
+ax = 8;
+subplot(4,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 8')
+
+% On observe des separations nettes sur ces axes. 
+% Il va donc falloir trouver les classes correspondantes.
+
+% Sur le premier axe, on distingue 4 groupes : 
+% 1) les coordonnees du premier groupe sont <-8
+% 2) les coordonnees du second sont entre -8 et 3
+% 3) les coordonnees du troisieme groupe sont entre 3 et 15
+% 4) les coordonnees du quatrieme groupe sont >15
+C1 = find(C(:,1)<-8); % Dans C1, on a les indices des elements de la premiere
+% colonne de C qui sont <-8
+C2 = find(C(:,1)<3); C2 = setdiff(C2,C1); % Dans C2,on a les indices des 
+% elements de la premiere premiere colonne de C qui sont <3 et >-8
+C3 = find(C(:,1)<15); C3 = setdiff(C3,[C1;C2]); % Dans C3, on a les indices 
+% des elements de la premiere de la premiere colonne de C qui sont <15 et
+% >3
+C4 = find(C(:,1)>15); % Dans C4, on a les indices des elements de la premiere
+% colonne de C qui sont >15
+% Si tout va bien, C1,C2,C3,C4 forment une partition de 1:nb_indiv: c'est
+% ce qu'on vérifie ici
+if(~all(sort([C1;C2;C3;C4])==(1:nb_indiv)'))
+    disp('something wrong happend')
+end
+
+ pause
+
+% Dans une nouvelle figure, on affiche avec des couleurs le partitionnement
+% sur l'axe etudié, pour vérifier qu'on ne s'est pas tromper dans la 
+% méthodologie, puis on observe ce partitionnement sur un ou plusieurs
+% autres axes, pour mettre en évidence l'information supplémentaire; c'est 
+% à dire des classes qu'on pourrait sur-couper 
+figure(3), clf
+ax = 1;
+subplot(2,1,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on,plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+title('axe 1')
+ax = 2;
+subplot(2,1,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on, plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+title('axe 2')
+
+ pause
+
+% Sur cette figure 3 on observe que la classe C2 contient en fait deux
+% classes. On decoupe donc C2
+C5 = find(C(:,2)<-15);
+C2 = setdiff(C2,C5);
+if(~all(sort([C1;C2;C3;C4;C5])==(1:nb_indiv)'))
+    disp('something wrong happend')
+end
+% On refait la meme chose qu'avec la figure 3 sur une nouvelle figure
+figure(4), clf
+ax = 2;
+subplot(3,1,1)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on, plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+hold on, plot(C(C5,ax),zeros(length(C5),1),'k*')
+title('axe 2')
+% Cette fois-ci, la composante principale suivante ne nous permet pas de 
+% sur-decouper nos classes...
+ax = 3;
+subplot(3,1,2)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on, plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+hold on, plot(C(C5,ax),zeros(length(C5),1),'k*')
+title('axe 3')
+% ...On passe donc a la quatrieme
+ax = 4;
+subplot(3,1,3)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on, plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+hold on, plot(C(C5,ax),zeros(length(C5),1),'k*')
+title('axe 4')
+
+ pause
+
+% Sur l'axe 4 on voit que C1 est partitionnable :
+C6 = find(C(:,4)<-10);C1 =setdiff(C1,C6);
+if(~all(sort([C1;C2;C3;C4;C5;C6])==(1:nb_indiv)'))
+    disp('something wrong happend')
+end
+% On reitere l'operation des figures 3 et 4 avec la figure 5
+figure(5),clf
+ax = 4;
+subplot(2,1,1)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on, plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+hold on, plot(C(C5,ax),zeros(length(C5),1),'k*',C(C6,ax),zeros(length(C6),1),'y*')
+title('axe 4')
+ax = 6;
+% Comme precedemment, l'axe 5 ne nous apprend rien de nouveau (on ne 
+% l'affiche pas). On passe donc a l'axe 6, qui montre que la classe 4 se 
+% divise en 2
+subplot(2,1,2)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-')
+hold on, plot(C(C1,ax),zeros(length(C1),1),'r*',C(C2,ax),zeros(length(C2),1),'b*')
+hold on, plot(C(C3,ax),zeros(length(C3),1),'m*',C(C4,ax),zeros(length(C4),1),'g*')
+hold on, plot(C(C5,ax),zeros(length(C5),1),'k*',C(C6,ax),zeros(length(C6),1),'y*')
+title('axe 6')
+
+C7 = find(C(:,6)<-10); C4 = setdiff(C4,C7);
+if(~all(sort([C1;C2;C3;C4;C5;C6;C7])==(1:nb_indiv)'))
+    disp('something wrong happend')
+end
+
+ pause
+
+% Apres la decouverte de C7, on n'a plus d'axe sur lequel s'appuyer pour
+% decouvrir d'autres classes. On reaffiche la figure du depart (les 6
+% composantes principales) avec les classes par couleur.
+figure(10), clf
+ax = 1;
+subplot(3,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(C1,ax),zeros(length(C1),1),'r*')
+hold on, plot(C(C2,ax),zeros(length(C2),1),'b*',C(C3,ax),zeros(length(C3),1),'m*')
+hold on, plot(C(C4,ax),zeros(length(C4),1),'g*',C(C5,ax),zeros(length(C5),1),'k*')
+hold on, plot(C(C6,ax),zeros(length(C6),1),'y*',C(C7,ax),zeros(length(C7),1),'c*')
+title('axe 1')
+ax = 2;
+subplot(3,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(C1,ax),zeros(length(C1),1),'r*')
+hold on, plot(C(C2,ax),zeros(length(C2),1),'b*',C(C3,ax),zeros(length(C3),1),'m*')
+hold on, plot(C(C4,ax),zeros(length(C4),1),'g*',C(C5,ax),zeros(length(C5),1),'k*')
+hold on, plot(C(C6,ax),zeros(length(C6),1),'y*',C(C7,ax),zeros(length(C7),1),'c*')
+title('axe 2')
+ax = 3;
+subplot(3,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(C1,ax),zeros(length(C1),1),'r*')
+hold on, plot(C(C2,ax),zeros(length(C2),1),'b*',C(C3,ax),zeros(length(C3),1),'m*')
+hold on, plot(C(C4,ax),zeros(length(C4),1),'g*',C(C5,ax),zeros(length(C5),1),'k*')
+hold on, plot(C(C6,ax),zeros(length(C6),1),'y*',C(C7,ax),zeros(length(C7),1),'c*')
+title('axe 3')
+ax = 4;
+subplot(3,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(C1,ax),zeros(length(C1),1),'r*')
+hold on, plot(C(C2,ax),zeros(length(C2),1),'b*',C(C3,ax),zeros(length(C3),1),'m*')
+hold on, plot(C(C4,ax),zeros(length(C4),1),'g*',C(C5,ax),zeros(length(C5),1),'k*')
+hold on, plot(C(C6,ax),zeros(length(C6),1),'y*',C(C7,ax),zeros(length(C7),1),'c*')
+title('axe 4')
+ax = 5;
+subplot(3,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(C1,ax),zeros(length(C1),1),'r*')
+hold on, plot(C(C2,ax),zeros(length(C2),1),'b*',C(C3,ax),zeros(length(C3),1),'m*')
+hold on, plot(C(C4,ax),zeros(length(C4),1),'g*',C(C5,ax),zeros(length(C5),1),'k*')
+hold on, plot(C(C6,ax),zeros(length(C6),1),'y*',C(C7,ax),zeros(length(C7),1),'c*')
+title('axe 5')
+ax = 6;
+subplot(3,2,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(C1,ax),zeros(length(C1),1),'r*')
+hold on, plot(C(C2,ax),zeros(length(C2),1),'b*',C(C3,ax),zeros(length(C3),1),'m*')
+hold on, plot(C(C4,ax),zeros(length(C4),1),'g*',C(C5,ax),zeros(length(C5),1),'k*')
+hold on, plot(C(C6,ax),zeros(length(C6),1),'y*',C(C7,ax),zeros(length(C7),1),'c*')
+title('axe 6')
+
+ pause
+
+% A la fin de cette première étape, on a donc trouvé 7 classes. En vérité
+% il y en a huit à voir. Mais pour les voir il faut restreindre les
+% matrices aux blocs deja trouvées. Je ne compte pas que les étudiants aient 
+% cette démarche. Il s'agit surtout d'amuser les meilleurs d'entre eux.
+% Voici cependant la manière dont ils devraient procéder
+disp('Fin de l analyse de X : 7 classes trouvees')
+% Peut-on découper C1 ?
+X1 =X(C1,:);
+[nb_indiv,nb_param] = size(X1);
+x_mean = mean(X1,1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+% Avec cette figure, il est clair que rien ne sert d'aller voir plus loin
+% que la premiere composante ppale
+figure(11),clf
+plot(1:nb_param,D/trace(S),'r-*','linewidth',2);
+
+ pause
+
+% On affiche quand meme la deuxieme, par acquis de conscience, et il est
+% clair qu'il n'y a plus d'info sur une eventuelle classif à soutirer des
+% axes suivants
+figure(12), clf
+ax = 1;
+subplot(2,1,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+ax = 2;
+subplot(2,1,ax)
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 2')
+% C1 se sous-divise donc :
+C8 = find(C(:,1)>0);
+C8 = C1(C8);
+C1 = setdiff(C1,C8);
+disp('Fin de l analyse de X(C1,:) :  decoupage de C1 en 2 classes : newC1 et C8')
+
+ pause
+
+% Peut-on decouper la nouvelle classe C1 ?
+X1 =X(C1,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(112), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(newC1,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C2 ?
+X1 =X(C2,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(22), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C2,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C3 ?
+X1 =X(C3,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(32), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C3,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C4 ?
+X1 =X(C4,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(42), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C4,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C5 ?
+X1 =X(C5,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(52), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C5,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C6 ?
+X1 =X(C6,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(62), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C6,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C7 ?
+X1 =X(C7,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(72), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C7,:) :  pas de nouvelle coupe')
+
+ pause
+
+% Peut-on decouper C8 ?
+X1 =X(C8,:);
+[nb_indiv,~] = size(X1);
+x_mean = mean(X1);
+Xc = X1-ones(nb_indiv,1)*x_mean; 
+S = 1/nb_indiv*(Xc'*Xc); [W,D] = eig(S); [D,tri]=sort(diag(D),'descend');
+W = W(:,tri);
+C = Xc*W;
+figure(82), clf
+ax = 1;
+plot([min(C(:,ax))-1 max(C(:,ax))+1],[0 0],'k-',C(:,ax),zeros(nb_indiv,1),'r*')
+title('axe 1')
+disp('Fin de l analyse de X(C8,:) :  pas de nouvelle coupe')
