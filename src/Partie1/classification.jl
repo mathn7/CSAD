@@ -1,7 +1,8 @@
 using LinearAlgebra
 using Plots
 using PyPlot
-using Statictics
+using Statistics
+using JLD2
 
 ## Utilisation de l'ACP pour detecter deux classes
 
@@ -9,14 +10,14 @@ using Statictics
 # retrouver via l'ACP
 nb_indiv1 = 100
 nb_indiv2 = 150
-nb_indiv = nb_indiv1+nb_indiv2;
+nb_indiv = nb_indiv1+nb_indiv2
 nb_param = 30
 # Creation de la premiere classe autour de l'element moyen -.5*(1 .... 1)
 X1 = 3*rand(nb_indiv1,nb_param)
-X1 = X1 - 0.5*ones(nb_indiv1,1)*ones(1,nb_param)
+X1 = X1 - 0.5*ones(nb_indiv1)*ones(nb_param)'
 # Creation de la premiere classe autour de l'element moyen + (1 .... 1)
 X2 = 3*rand(nb_indiv2,nb_param)
-X2 = X2 + 1*ones(nb_indiv2,1)*ones(1,nb_param)
+X2 = X2 + 1*ones(nb_indiv2)*ones(nb_param)'
 # Creation du tableau des donnees (concatenation des deux classes) 
 # et du tableau centr� des donnees
 X = [X1;X2]
@@ -28,13 +29,13 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # CONTRASTE QU'ILS FOURNISSENT.
 # CALCULER LA MATRICE C DE L'ECHANTILLON DANS CE NOUVEAU REPERE
 ###########################################################################
-x_mean = mean(X,1) 
-Xc = X-ones(nb_indiv,1)*x_mean
+x_mean = mean(X,dims=1) 
+Xc = X-ones(nb_indiv)*x_mean
 S = 1/nb_indiv*(Xc'*Xc)
-W,D = eigen(S)
+D,W = eigen(S)
 tri = sortperm(D,rev=true)
 D = D[tri]
-W = W(:,tri)
+W = W[:,tri]
 C = Xc*W
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
@@ -46,24 +47,25 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # PRINCIPAUX (AVEC A NOUVEAU UNE COULEUR PAR CLASSE).
 # COMMENTER.
 ###########################################################################
-figure(1), clf, 
+close(1);close(2);close(3);close(4);close(5);close(6);
+figure(1)
 subplot(2,1,1)
 # Affichage des donnees sur les premieres composantes canoniques :
 # les individus de la premiere classe sont en rouge
-plot([min(X(:,1))-1 max(X(:,1))+1],[0 0],'k-'),
-plot(X(1:nb_indiv1,1),zeros(nb_indiv1,1),'r*'); 
+PyPlot.plot([minimum(X[:,1])-1, maximum(X[:,1])+1],[0, 0],color=:cyan)
+PyPlot.scatter(X[1:nb_indiv1],zeros(nb_indiv1),color=:red) 
 # ceux de la seconde classe sont en bleu
-plot(X(nb_indiv1+1:nb_indiv,1),zeros(nb_indiv2,1),'b*');
+PyPlot.scatter(X[nb_indiv1+1:nb_indiv,1],zeros(nb_indiv2),color=:blue)
 title("Visualisation des donnees sur les deux premiers axes canoniques")
 
 # Affichage des donnees sur les premieres composantes principales : (m�me
 # code couleur)
 subplot(2,1,2)
-plot([min(C(:,1))-1 max(C(:,1))+1],[0 0],'k-')
-plot(C(1:nb_indiv1,1),zeros(nb_indiv1,1),'r*');
-plot(C(nb_indiv1+1:nb_indiv,1),zeros(nb_indiv2,1),'b*');
+PyPlot.plot([minimum(C[:,1])-1, maximum(C[:,1])+1],[0, 0],color=:cyan,label="droite des reels")
+PyPlot.scatter(C[1:nb_indiv1],zeros(nb_indiv1),color=:red,label="classe 1") 
+PyPlot.scatter(C[nb_indiv1+1:nb_indiv,1],zeros(nb_indiv2),color=:blue,label="classe 2")
 title("Visulisation des donnees sur les deux premiers axes principaux")
-legend("droite des reels','classe 1','classe 2")
+legend()
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 ###########################################################################
@@ -72,10 +74,12 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # EN ABSCISSE DOIT SE TROUVER LE NUMERO DE LA COMPOSANTE OBSERVEE, EN 
 # ORDONNEE ON MONTRERA LE POURCENTAGE D'INFO QUE CONTIENT CETTE COMPOSANTE.
 ###########################################################################
-figure(2), clf
-plot(1:nb_param,D/trace(S),'r-*','linewidth',2);
+figure(2)
+trace_S = sum(diag(S))
+PyPlot.plot(1:nb_param,D/trace_S,"r-*")
 title("Pourcentage d info contenue sur chaque composante ppale -- 2 classes")
-xlabel('num de la comp. ppale');ylabel('pourcentage d info');
+xlabel("num de la comp. ppale")
+ylabel("pourcentage d info")
 
 ## Utilisation de l'ACP pour detecter plusieurs classes
 
@@ -83,10 +87,10 @@ xlabel('num de la comp. ppale');ylabel('pourcentage d info');
 # pour des individus caracterises par les memes variables. On concatene 
 # tableaux en un unique tableau X, et on va chercher combien de composantes
 # principales il faut prendre en compte afin de detecter toutes les classes
-load('quatre_classes.mat')
-n1 = size(X1,1);n2 = size(X2,1);n3 = size(X3,1);n4 = size(X4,1);
-n = n1+n2+n3+n4;
-nb_param = size(X1,2)
+@load "src/Partie1/quatre_classes.jld2"
+n1 = size(X1)[1];n2 = size(X2)[1];n3 = size(X3)[1];n4 = size(X4)[1]
+n = n1+n2+n3+n4
+nb_param = size(X1)[2]
 X = [X1;X2;X3;X4]
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
@@ -96,13 +100,13 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # CONTRASTE QU'ILS FOURNISSENT.
 # CALCULER LA MATRICE C DE L'ECHANTILLON DANS CE NOUVEAU REPERE.
 ###########################################################################
-x_mean = mean(X,1);
-Xc = X-ones(n,1)*x_mean;
-S = 1/n*(Xc'*Xc); 
-[W,D] = eig(S); 
+x_mean = mean(X,dims=1) 
+Xc = X-ones(n)*x_mean
+S = 1/n*(Xc'*Xc)
+D,W = eigen(S)
 tri=sortperm(D,rev=true)
 D = D[tri]
-W = W(:,tri)
+W = W[:,tri]
 C = Xc*W
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
@@ -116,29 +120,29 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # COMPOSANTE, LA DEUXIEME, LA TROISIEME, PUIS LES TROIS ENSEMBLES ?
 # NB : VOTRE FIGURE DOIT CORRESPONDRE A LA FIGURE 2(b) DE L'ENONCE.
 ###########################################################################
-figure(3),clf
+figure(3)
 subplot(3,1,1)
-plot([min(C(:,1))-0.5 max(C(:,1))+0.5],[0 0],'k-'), 
-plot(C(1:n1,1),zeros(1,n1),'r*'); 
-plot(C(n1+1:n1+n2,1),zeros(1,n2),'b*')
-plot(C(n1+n2+1:n1+n2+n3,1),zeros(1,n3),'g*')
-plot(C(n1+n2+n3+1:n1+n2+n3+n4,1),zeros(1,n4),'m*');
+PyPlot.plot([minimum(C[:,1])-0.5, maximum(C[:,1])+0.5],[0, 0],"k-") 
+PyPlot.plot(C[1:n1,1],zeros(n1),"r*") 
+PyPlot.plot(C[n1+1:n1+n2,1],zeros(n2),"b*")
+PyPlot.plot(C[n1+n2+1:n1+n2+n3,1],zeros(n3),"g*")
+PyPlot.plot(C[n1+n2+n3+1:n1+n2+n3+n4,1],zeros(n4),"m*")
 title("1ere composante ppale")
 
 subplot(3,1,2)
-plot([min(C(:,2))-0.5 max(C(:,2))+0.5],[0 0],'k-'), 
-plot(C(1:n1,2),zeros(1,n1),'r*'); 
-plot(C(n1+1:n1+n2,2),zeros(1,n2),'b*')
-plot(C(n1+n2+1:n1+n2+n3,2),zeros(1,n3),'g*')
-plot(C(n1+n2+n3+1:n1+n2+n3+n4,2),zeros(1,n4),'m*');
+PyPlot.plot([minimum(C[:,2])-0.5, maximum(C[:,2])+0.5],[0, 0],"k-") 
+PyPlot.plot(C[1:n1,2],zeros(n1),"r*") 
+PyPlot.plot(C[n1+1:n1+n2,2],zeros(n2),"b*")
+PyPlot.plot(C[n1+n2+1:n1+n2+n3,2],zeros(n3),"g*")
+PyPlot.plot(C[n1+n2+n3+1:n1+n2+n3+n4,2],zeros(n4),"m*")
 title("2eme composante ppale")
 
 subplot(3,1,3)
-plot([min(C(:,3))-0.5 max(C(:,3))+0.5],[0 0],'k-'), 
-plot(C(1:n1,3),zeros(1,n1),'r*'); 
-plot(C(n1+1:n1+n2,3),zeros(1,n2),'b*')
-plot(C(n1+n2+1:n1+n2+n3,3),zeros(1,n3),'g*')
-plot(C(n1+n2+n3+1:n1+n2+n3+n4,3),zeros(1,n4),'m*');
+PyPlot.plot([minimum(C[:,3])-0.5, maximum(C[:,3])+0.5],[0, 0],"k-") 
+PyPlot.plot(C[1:n1,3],zeros(n1),"r*") 
+PyPlot.plot(C[n1+1:n1+n2,3],zeros(n2),"b*")
+PyPlot.plot(C[n1+n2+1:n1+n2+n3,3],zeros(n3),"g*")
+PyPlot.plot(C[n1+n2+n3+1:n1+n2+n3+n4,3],zeros(n4),"m*")
 title("3eme composante ppale")
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
@@ -149,20 +153,20 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # COMBIEN DE CLASSES PEUT-ON DETECTER DANS LE PLAN ? DANS L'ESPACE ?
 # NB : VOS FIGURES DOIVENT CORRESPONDRE AUX FIGURES 2(c) ET (d) DE L'ENONCE 
 ###########################################################################
-figure(4), clf, 
-plot(C(1:n1,1),C(1:n1,2),'r*'); 
-plot(C(n1+1:n1+n2,1),C(n1+1:n1+n2,2),'b*')
-plot(C(n1+n2+1:n1+n2+n3,1),C(n1+n2+1:n1+n2+n3,2),'g*')
-plot(C(n1+n2+n3+1:n1+n2+n3+n4,1),C(n1+n2+n3+1:n1+n2+n3+n4,2),'m*');
+figure(4)
+PyPlot.plot(C[1:n1,1],C[1:n1,2],"r*",label="ind. de la classe 1")
+PyPlot.plot(C[n1+1:n1+n2,1],C[n1+1:n1+n2,2],"b*",label="ind. de la classe 2")
+PyPlot.plot(C[n1+n2+1:n1+n2+n3,1],C[n1+n2+1:n1+n2+n3,2],"g*",label="ind. de la classe 3")
+PyPlot.plot(C[n1+n2+n3+1:n1+n2+n3+n4,1],C[n1+n2+n3+1:n1+n2+n3+n4,2],"m*",label="ind. de la classe 4")
 title("Proj. des donnees sur les deux 1ers axes ppaux")
-legend("ind. de la classe 1','ind. de la classe 2','ind. de la classe 3','ind. de la classe 4")
+legend()
 
-figure(5),clf, 
-plot3(C(1:n1,1),C(1:n1,2),C(1:n1),'r*')
-plot3(C(n1+1:n1+n2,1),C(n1+1:n1+n2,2),C(n1+1:n1+n2,3),'b*');
-plot3(C(n1+n2+1:n1+n2+n3,1),C(n1+n2+1:n1+n2+n3,2),C(n1+n2+1:n1+n2+n3,3),'g*');
-plot3(C(n1+n2+n3+1:n1+n2+n3+n4,1),C(n1+n2+n3+1:n1+n2+n3+n4,2),C(n1+n2+n3+1:n1+n2+n3+n4,3),'m*');
-legend("ind. de la classe 1','ind. de la classe 2','ind. de la classe 3','ind. de la classe 4")
+figure(5)
+PyPlot.plot3D(C[1:n1,1],C[1:n1,2],C[1:n1],"r*",label="ind. de la classe 1")
+PyPlot.plot3D(C[n1+1:n1+n2,1],C[n1+1:n1+n2,2],C[n1+1:n1+n2,3],"b*",label="ind. de la classe 2")
+PyPlot.plot3D(C[n1+n2+1:n1+n2+n3,1],C[n1+n2+1:n1+n2+n3,2],C[n1+n2+1:n1+n2+n3,3],"g*",label="ind. de la classe 3")
+PyPlot.plot3D(C[n1+n2+n3+1:n1+n2+n3+n4,1],C[n1+n2+n3+1:n1+n2+n3+n4,2],C[n1+n2+n3+1:n1+n2+n3+n4,3],"m*",label="ind. de la classe 4")
+legend()
 title("Proj. des donnees sur 3 1ers axes ppaux")
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
@@ -172,11 +176,12 @@ println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 # EN ABSCISSE DOIT SE TROUVER LE NUMERO DE LA COMPOSANTE OBSERVEE, EN 
 # ORDONNEE ON MONTRERA LE POURCENTAGE D'INFO QUE CONTIENT CETTE COMPOSANTE.
 ###########################################################################
-figure(6),clf
-plot(1:nb_param,D/trace(S),'r-*','linewidth',2)
+figure(6)
+trace_S=sum(diag(S))
+PyPlot.plot(1:nb_param,D/trace_S,"r-*")
 title("Pourcentage d info contenue sur chaque composante ppale -- 4 classes")
-xlabel("num de la comp. ppale");
-ylabel("pourcentage d info");
+xlabel("num de la comp. ppale")
+ylabel("pourcentage d info")
 
 println(" ** A COMPLETER ** CONSIGNES EN COMMENTAIRE ** ")
 ###########################################################################
