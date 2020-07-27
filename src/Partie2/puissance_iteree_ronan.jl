@@ -23,20 +23,24 @@ x = x/norm(x)
 bool = true
 iv1 = 0  # pour compter le nombre d iterations effectuees
 #t_v1 =  cputime # pour calculer le temps d execution de l'algo
-println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
+
+#println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
+
 # CODER L ALGORITHME DE LA PUISSANCE ITEREE TEL QUE DONNE DANS LE
 # SUJET, POUR LA MATRICE AAt
 
 for i = 1:3
-    while bool
-        x = AAt*x
-        x = x/norm(x)
-        lambda = x'*AAt*x
-        err1 = norm(lambda*x - AAt*x)/abs(lambda)
+    @time while bool
+        global x = AAt*x
+        x = x / norm(x)
+        global lambda = x'*AAt*x
+        global err1 = norm(lambda*x - AAt*x)/abs(lambda)
         if err1<eps || iv1>kmax
             bool = false
+            println("\nTemps pour une ite:"*string(i))
+            printstyled("------------------------------------------\n> ",color=:green)
         end
-        iv1 = iv1+1
+        global iv1 = iv1+1
     end
     #t_v1 = cputime-t_v1 # t_version1 : temps d execution de l algo
     # de la puissance iteree pour la matrice AAt
@@ -54,19 +58,22 @@ println(D)
 vp1 =[]
 y1 = []
 #t_v2 =  cputime # pour calculer le temps d execution de l'algo
-println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
+
+#println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
+
 # CODER L ALGORITHME DE LA PUISSANCE ITEREE TEL QUE DONNE DANS LE
 # SUJET, POUR LA MATRICE AtA
 for i = 1:5
-    y = ones(p,1) y = y/norm(y)
+    y = ones(p,1) 
+    y = y/norm(y)
     bool = true
     iv2 = 0  # pour compter le nombre d iterations effectuees
-    while bool
+    @time while bool
         y = AtA*y
         y = y/norm(y)
         nu = y'*AtA*y
         err2 = norm(nu*y - AtA*y)/abs(nu)
-        if(err2<eps || iv2>kmax)
+        if err2<eps || iv2>kmax
             bool = false
         end
         iv2 = iv2+1
@@ -79,12 +86,12 @@ for i = 1:5
 end
 ## t_v3 =  cputime # pour calculer le temps d execution de l'algo
 
-vp1
-y1
+display(vp1)
+display(y1)
 ## t_v3 = cputime-t_v3
 
+#println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
 
-println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
 # APRES VOUS ETRE ASSURE DE LA CONVERGENCE DES DEUX METHODES, AFFICHER 
 # L'ECART RELATIF ENTRE LES DEUX VALEURS PROPRES TROUVEES, ET LE TEMPS
 # MOYEN PAR ITERATION POUR CHACUNE DES DEUX METHODES. CONCLURE SUR
@@ -99,8 +106,7 @@ c = zeros(p,p)
 vp2 = []
 y2 = []
 
-for i = 1:5
-   
+for i = 1:5   
     y = ones(p,1) 
     y = y/norm(y)    
     z = A*y
@@ -109,7 +115,7 @@ for i = 1:5
     bool = true
     iv2 = 0
 
-    while(bool)
+    while bool
         z = A*y
         z1 = c*y
         y = A'*z - c'*z1

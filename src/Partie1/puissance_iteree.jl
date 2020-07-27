@@ -29,7 +29,7 @@ iv1 = 0  # pour compter le nombre d iterations effectuees
 # CODER L ALGORITHME DE LA PUISSANCE ITEREE TEL QUE DONNE DANS L'ENONCE
 # POUR LA MATRICE AAt
 
-@time while(non_cv)
+@time while non_cv
     global x = AAt * x
     x = x / norm(x)
     global lambda = x' * AAt * x
@@ -59,7 +59,7 @@ iv2 = 0  # pour compter le nombre d iterations effectuees
 # CODER L ALGORITHME DE LA PUISSANCE ITEREE TEL QUE DONNE DANS L'ENONCE
 # POUR LA MATRICE AtA
 
-@time while(non_cv)
+@time while non_cv
     global y = AtA * y
     y = y / norm(y)
     global nu = y' * AtA * y

@@ -32,7 +32,7 @@ iv1 = 0  # pour compter le nombre d iterations effectuees
 # CODER L ALGORITHME DE LA PUISSANCE ITEREE TEL QUE DONNE DANS L'ENONCE
 # POUR LA MATRICE AAt
 #
-@time while(non_cv)
+while non_cv
     V = AAt*V
     for i=1:m
         V[:,i] = V[:,i] / norm(V[:,i]);
@@ -65,7 +65,7 @@ println("** A COMPLETER ** CONSIGNES EN COMMENTAIRE **")
 # CODER L ALGORITHME DE LA PUISSANCE ITEREE TEL QUE DONNE DANS L'ENONCE
 # POUR LA MATRICE AtA
 #
-@time while(non_cv)
+while non_cv
     VV = AtA*VV;
     for i=1:m
         VV[:,i] = VV[:,i] / norm(VV[:,i])
@@ -90,5 +90,5 @@ end
 @printf("Erreur relative pour la methode avec la grande matrice = %0.3e\n",err1)
 @printf("Erreur relative pour la methode avec la petite matrice = %0.3e\n",err2)
 @printf("Ecart relatif entre les deux valeurs propres trouvees = %1.2e\n", abs(lambda[1,1]-nu[1,1])/abs(nu[1,1]))
-#@printf("Temps pour une ite avec la grande matrice = %0.3e\n",t_v1/iv1)
-#@printf("Temps pour une ite avec la petite matrice = %0.3e\n",t_v2/iv2)
+@printf("Temps pour une ite avec la grande matrice = %0.3e\n",t_v1/iv1)
+@printf("Temps pour une ite avec la petite matrice = %0.3e\n",t_v2/iv2)
