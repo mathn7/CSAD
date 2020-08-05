@@ -11,6 +11,7 @@ using Plots
 #figure('Name','Individu moyen et eigenfaces','Position',[0,0,0.67*L,0.67*H]);
 
 # Calcul de l'individu moyen :
+X = Float64.(X')
 individu_moyen = mean(X,dims=1)
 
 # Centrage des donnees :
@@ -44,31 +45,20 @@ W = X_c'*Y
 # mais le calcul qui donne W, les vecteurs propres de Sigma,
 # leur fait perdre cette propri??t??] :
 normes_eigenfaces = sqrt(sum(W.^2))
-W = W./(ones(p)*normes_eigenfaces)
+
+#W = W./(ones(p)*normes_eigenfaces)
 
 
 # Affichage de l'individu moyen et des eigenfaces sous forme d'images :
 plt = Plots.plot(layout=(nb_individus,nb_postures),showaxis = false)
 
 img = reshape(individu_moyen,nb_lignes,nb_colonnes)
-Plots.plot!(Gray.(img),title="Individu moyen",subplot=1)
+Plots.plot!(Gray.(img),title="Individu moyen",titlefontsize=7,subplot=1)
 
 for k = 1:n-1
 	img = reshape(W[:,k],nb_lignes,nb_colonnes)
-	Plots.plot!(Gray.(img),title="Eigenface-"*string(k),subplot=k+1)
+	Plots.plot!(Gray.(img),title="Eigenface "*string(k),titlefontsize=7,subplot=k+1)
 	display(plt)
 end
 
-@save "src/Partie3/exercice_1.jld2" W valeurs_propres_triees normes_eigenfaces Sigma_2 X_c2 Y
-#=
-plt = Plots.plot(layout=(nb_individus,nb_postures),showaxis = false)
-# Affichage des images (un individu par ligne, une posture par colonne) :
-for l = 1:n
-	j = numeros_individus[Int(floor((l-1)/nb_postures)+1)]
-	k = numeros_postures[Int(mod((l-1),nb_postures)+1)]
-	img = reshape(X[l,:],nb_lignes,nb_colonnes,3)
-	#subplot(nb_individus,nb_postures,l)
-	Plots.plot!(float2im(img),title="Ind. "*string(j)*", Post."*string(k))
-    display(plt)
-end
- =#
+@save "src/Partie3/exercice_1.jld2" W valeurs_propres_triees normes_eigenfaces Sigma_2 X_c2 Y X_c n p individu_moyen
