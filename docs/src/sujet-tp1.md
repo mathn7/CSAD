@@ -41,7 +41,7 @@ Dans ce nouveau repère, l’origine correspond à l’individu moyen (i.e. la m
 ``\\ \hspace*{4cm}``
 ``\mathbf{X}^{c}=\left[\begin{array}{c} \left(\mathbf{x}_{1}-\overline{\mathbf{x}}\right)^{\top} \\ \vdots \\ \left(\mathbf{x}_{n}-\overline{\mathbf{x}}\right)^{\top}\end{array}\right]=\left[\begin{array}{c} \mathbf{x}_{1}^{c} \top \\ \vdots \\ \mathbf{x}_{n}^{c} \top \end{array}\right]``
 
-![](assets/axes.png)
+![](assets/tp1-axes.png)
 
 Figure 1 – Les points en rouge sont des vecteurs de ``\mathbb{R}^2`` . On les affiche dans le repère canonique dans lequel les données sont initialement exprimées. Puis on affiche dans ce repère le nouveau repère fourni par l’ACP. On voit que le premier axe correspond à la direction qui maximise la dispersion des données.
 
@@ -83,7 +83,7 @@ De nombreuses raisons peuvent amener à chercher des classes parmi un groupe d�
 
 **Question 7**: Dans le fichier *dataset.jld2*, combien de classes de variables peut-on identifier ? Ecrire un nouveau script Julia *classes_variables.jl* permettant de visualiser clairement ces classes.
 
-![](assets/projection.png)
+![](assets/tp1-projection.png)
 
 Figure 2 – (a) : composante principale d’un nuage de points contenant deux classes : cette première composante suffit à mettre en évidence les deux classes. Les images (b), (c), (d) représentent un même nuage de points de ``\mathbb{R}^{30}`` – contenant quatre classes – dans trois configurations différentes : (b) : première, deuxième et troisième composantes principales du nuage. (c) : le nuage dans le repère défini par les deux premiers axes principaux. (c) : le nuage dans le repère défini par les trois premiers axes principaux.
 
@@ -94,18 +94,18 @@ Dans les codes fournis, on récupère les éléments propres de Σ la matrice de
 On pourrait aussi utiliser la très classique méthode de la puissance itérée avec déflation, qui renverrait les couples propres directement dans l’ordre voulu. L’algorithme de la puissance itérée pour trouver le couple propre dominant – i.e sans l’opération de déflation – est présenté ci-dessous.
 
 **METHODE DE LA PUISSANCE ITÉRÉE** ``\\``
-**Données** : une matrice ``\mathbf{M} \in \mathbb{R}^{p \times p},`` un vecteur normé ``\mathbf{x} \in \mathbb{R}^{p},`` une tolérance ``\epsilon>0,`` itmax nombre max d'itérations.``\\``
-**Sortie** : ``(\lambda, \mathbf{x}) \in \mathbb{R} \times \mathbb{R}^{p}`` couple propre dominant de ``\mathbf{M} \\``
-**Initialisation** : ``c v \leftarrow . F A L S E ., i \leftarrow 0, \lambda \leftarrow \mathbf{x}^{\top} \mathbf{M} \mathbf{x} \\``
-1. **Tant que** .NOT.cv:
-``\hspace*{1.5cm}`` ``\mu \leftarrow \lambda \\``
-``\hspace*{1.5cm}`` ``\mathbf{x} \leftarrow \mathbf{M} \mathbf{x} \\``
-``\hspace*{1.5cm}`` ``\mathbf{x} \leftarrow \mathbf{x} /\|\mathbf{x}\| \\``
-``\hspace*{1.5cm}`` ``\lambda \leftarrow \mathbf{x}^{\top} \mathbf{M} \mathbf{x} \\``
-``\hspace*{1.5cm}`` ``i \leftarrow i+1 \\``
-``\hspace*{1.5cm}`` ``c v \leftarrow\left(\frac{|\lambda-\mu|}{|\mu|} \leq \epsilon\right) . O R \cdot\left(i \geq i t_{\max }\right) \\``
-2. **Retourner** ``(\lambda, \mathrm{x})``
----
+``\hspace*{0.5cm}``**Données** : une matrice ``\mathbf{M} \in \mathbb{R}^{p \times p},`` un vecteur normé ``\mathbf{x} \in \mathbb{R}^{p},`` une tolérance ``\epsilon>0,`` itmax nombre max d'itérations.``\\``
+``\hspace*{0.5cm}``**Sortie** : ``(\lambda, \mathbf{x}) \in \mathbb{R} \times \mathbb{R}^{p}`` couple propre dominant de ``\mathbf{M} \\``
+``\hspace*{0.5cm}``**Initialisation** : ``c v \leftarrow \text{FALSE}, i \leftarrow 0, \lambda \leftarrow \mathbf{x}^{\top} \mathbf{M} \mathbf{x} \\``
+``\hspace*{0.5cm}``1. **Tant que** .NOT.cv:
+``\hspace*{1cm}`` ``\mu \leftarrow \lambda \\``
+``\hspace*{1cm}`` ``\mathbf{x} \leftarrow \mathbf{M} \mathbf{x} \\``
+``\hspace*{1cm}`` ``\mathbf{x} \leftarrow \mathbf{x} /\|\mathbf{x}\| \\``
+``\hspace*{1cm}`` ``\lambda \leftarrow \mathbf{x}^{\top} \mathbf{M} \mathbf{x} \\``
+``\hspace*{1cm}`` ``i \leftarrow i+1 \\``
+``\hspace*{1cm}`` ``c v \leftarrow\left(\frac{|\lambda-\mu|}{|\mu|} \leq \epsilon\right) . \text{OR} \cdot\left(i \geq i t_{\max }\right) \\``
+``\hspace*{0.5cm}``2. **Retourner** ``(\lambda, \mathrm{x}) \\``
+
 Les opérations de cet algorithme consistent majoritairement en des produits matrice-vecteur. Ainsi, la taille de la matrice ``\mathbf{M}`` est déterminante pour arriver rapidement à la convergence, en terme de temps de calcul.
 
 **Question 8**: Soit une matrice rectangulaire ``\mathbf{H} \in \mathbb{R}^{p \times n} .`` Expliquer pourquoi connaitre les éléments propres - i.e. les valeurs propres et les vecteurs propres - de ``\mathbf{H}^{\top} \mathbf{H}`` permet de connaitre les éléments propres de ``\mathbf{H H}^{\top}``
